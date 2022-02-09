@@ -15,20 +15,26 @@ const {
 //     res.status(200).json({message: 'Get Books'})
 // })
 
-router.get("/", getBooks);
+router.route("/").get(getBooks).post(setBooks);
 
-router.get("/:id", getBook);
+router.route("/:id").get(getBook).put(updateBook).delete(deleteBook);
 
-router.get("/:id/authors", getBookAuthors);
-
-router.post("/", setBooks);
-
-router.post("/:id/authors", setBookAuthors);
-
-router.put("/:id", updateBook);
-
-router.delete("/:id", deleteBook);
+router.route("/:id/authors").get(getBookAuthors).post(setBookAuthors);
 
 router.delete("/:id/authors/:idAuthor", deleteBookAuthor);
+
+// router.get("/", getBooks);
+
+//router.get("/:id", getBook);
+
+//router.get("/:id/authors", getBookAuthors);
+
+// router.post("/", setBooks);
+
+//router.post("/:id/authors", setBookAuthors);
+
+//router.put("/:id", updateBook);
+
+//router.delete("/:id", deleteBook);
 
 module.exports = router;
