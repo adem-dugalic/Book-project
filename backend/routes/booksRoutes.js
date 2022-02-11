@@ -10,18 +10,23 @@ const {
   updateBook,
   setBooks,
 } = require("../controllers/bookController");
+const { protect } = require("../middleware/authMiddleware");
 
 // router.get('/api/books', (req, res) => {
 //     res.status(200).json({message: 'Get Books'})
 // })
 
-router.route("/").get(getBooks).post(setBooks);
+router.route("/").get(getBooks).post(protect, setBooks);
 
-router.route("/:id").get(getBook).put(updateBook).delete(deleteBook);
+router
+  .route("/:id")
+  .get(getBook)
+  .put(protect, updateBook)
+  .delete(protect, deleteBook);
 
-router.route("/:id/authors").get(getBookAuthors).post(setBookAuthors);
+router.route("/:id/authors").get(getBookAuthors).post(protect, setBookAuthors);
 
-router.delete("/:id/authors/:idAuthor", deleteBookAuthor);
+router.delete("/:id/authors/:idAuthor", protect, deleteBookAuthor);
 
 // router.get("/", getBooks);
 
