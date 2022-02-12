@@ -1,12 +1,16 @@
 const asyncHandler = require("express-async-handler");
 const Book = require("../models/bookModel");
+const mongoose = require("mongoose");
 
 // @desc Get all books
 // @route GET /api/books
 // @access public
 
 const getBooks = asyncHandler(async (req, res) => {
-  const books = await Book.find();
+  const books = await Book.find().populate({
+    path: "authors",
+    model: "Author",
+  });
   res.status(200).json(books);
 });
 
@@ -15,7 +19,15 @@ const getBooks = asyncHandler(async (req, res) => {
 // @access public
 
 const getBook = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `Get Book ${req.params.id}` });
+  const book = await Book.findById(req.params.id).populate({
+    path: "authors",
+    model: "Author",
+  });
+  if (!book) {
+    res.status(400);
+    throw new Error("Book not foun");
+  }
+  res.status(200).json(book);
 });
 
 // @desc Get authors of a book
@@ -23,7 +35,15 @@ const getBook = asyncHandler(async (req, res) => {
 // @access public
 
 const getBookAuthors = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `Book Authors` });
+  const bookAuthors = await Book.findById(req.params.id).populate({
+    path: "authors",
+    model: "Author",
+  });
+  if (!bookAuthors) {
+    res.status(400);
+    throw new Error("Book does not exist");
+  }
+  res.status(200).json(bookAuthors.authors);
 });
 
 // @desc Set books
@@ -41,11 +61,11 @@ const setBooks = asyncHandler(async (req, res) => {
     title: req.body.title,
     pages: req.body.pages,
     published: req.body.published,
-    authors: req.body.authors,
+    // authors: req.body.authors,
     image: req.body.image,
   });
 
-  res.status(201).json({ message: "Set Books" });
+  res.status(201).json({ message: "Set Book" });
 });
 
 // @desc Set authors of a book
@@ -53,20 +73,16 @@ const setBooks = asyncHandler(async (req, res) => {
 // @access private
 
 const setBookAuthors = asyncHandler(async (req, res) => {
-  if (!req.body.authors) {
+  if (!req.body.author) {
     res.status(400);
     throw new Error("Please add an author");
   }
-  const book = await Book.create({
-    isbn: req.body.isbn,
-    title: req.body.title,
-    pages: req.body.pages,
-    published: req.body.published,
-    authors: req.body.authors,
-    image: req.body.image,
+  const author = mongoose.Types.ObjectId(req.body.author);
+  const addedBookAuthors = await Book.findByIdAndUpdate(req.params.id, {
+    $push: { authors: author },
   });
 
-  res.status(201).json({ message: `Set Book ${req.params.id} authors` });
+  res.status(201).json({ message: `Set Book author` });
 });
 
 // @desc Update a book
@@ -111,11 +127,17 @@ const deleteBook = asyncHandler(async (req, res) => {
 // @access private
 
 const deleteBookAuthor = asyncHandler(async (req, res) => {
-  //IMNPORTANT FINISH
-
-  res.status(200).json({
-    message: `Delete Author ${req.params.idAuthor} from book ${req.params.id}`,
+  const authors = mongoose.Types.ObjectId(req.params.idAuthor);
+  const book = await Book.findByIdAndUpdate(req.params.id, {
+    $pull: { authors: authors },
   });
+
+  if (!book) {
+    res.status(400);
+    throw new Error("Book not fund");
+  }
+
+  res.status(200).json({ message: "Author deleted from book" });
 });
 
 module.exports = {
