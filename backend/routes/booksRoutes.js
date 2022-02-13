@@ -12,10 +12,6 @@ const {
 } = require("../controllers/bookController");
 const { protect } = require("../middleware/authMiddleware");
 
-// router.get('/api/books', (req, res) => {
-//     res.status(200).json({message: 'Get Books'})
-// })
-
 router.route("/").get(getBooks).post(protect, setBooks);
 
 router

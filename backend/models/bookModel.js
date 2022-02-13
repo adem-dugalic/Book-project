@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 
 const bookSchema = mongoose.Schema(
   {
-    // user: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: "User",
-    // },
     isbn: String, // International Standard Book Number (unique)
     title: String,
     pages: Number, // Total page numbers

@@ -52,19 +52,33 @@ const getAuthorBooks = asyncHandler(async (req, res) => {
 
 const setAuthors = asyncHandler(async (req, res) => {
   if (!req.body.firstName) {
-    //do zis better
     res.status(400);
     throw new Error("Please add a name");
   }
+
+  const books = req.body.books;
+  let objectBooks = [];
+  books &&
+    books.map((i) => {
+      objectBooks.push(mongoose.Types.ObjectId(i));
+    });
+
   const date = new Date(req.body.dob);
   const author = await Author.create({
-    id: req.body.id,
+    // id: req.body.id,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     dob: date,
-    // books: req.body.books,
     image: req.body.image,
   });
+
+  if (books) {
+    const addedAuthorBooks = await Author.findByIdAndUpdate(author._id, {
+      $push: { books: { $each: objectBooks } },
+    });
+  }
+
+  console.log("nope");
 
   res.status(201).json({ message: "Set authors" });
 });
@@ -78,9 +92,14 @@ const setAuthorBooks = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Please add an author");
   }
-  const books = mongoose.Types.ObjectId(req.body.books);
+
+  const books = req.body.books;
+  let objectBooks = [];
+  books.map((i) => {
+    objectBooks.push(mongoose.Types.ObjectId(i));
+  });
   const addedAuthorBooks = await Author.findByIdAndUpdate(req.params.id, {
-    $push: { books: books },
+    $push: { books: { $each: objectBooks } },
   });
   res.status(201).json({ message: `Set author a book to author` });
 });
@@ -121,7 +140,6 @@ const deleteAuthor = asyncHandler(async (req, res) => {
   }
 
   await author.remove();
-  // const deletedauthor = await Author.remove(author); // deleteOne ,  deleteMany insted of remove
 
   res.status(200).json({ message: `Delete author ${req.params.id}` });
 });

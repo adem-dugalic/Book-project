@@ -24,7 +24,7 @@ const getBook = asyncHandler(async (req, res) => {
     model: "Author",
   });
   if (!book) {
-    res.status(400);
+    res.status(404);
     throw new Error("Book not foun");
   }
   res.status(200).json(book);
@@ -52,18 +52,29 @@ const getBookAuthors = asyncHandler(async (req, res) => {
 
 const setBooks = asyncHandler(async (req, res) => {
   if (!req.body.title) {
-    //do zis better
     res.status(400);
-    throw new Error("Please add a title");
+    throw new Error("Please fill the fields");
   }
+
+  const authors = req.body.authors;
+  let objectAuthors = [];
+  authors &&
+    authors.map((i) => {
+      objectAuthors.push(mongoose.Types.ObjectId(i));
+    });
+
   const book = await Book.create({
     isbn: req.body.isbn,
     title: req.body.title,
     pages: req.body.pages,
     published: req.body.published,
-    // authors: req.body.authors,
     image: req.body.image,
   });
+  if (authors) {
+    const addedBookAuthors = await Book.findByIdAndUpdate(book.id, {
+      $push: { authors: { $each: objectAuthors } },
+    });
+  }
 
   res.status(201).json({ message: "Set Book" });
 });
@@ -73,13 +84,18 @@ const setBooks = asyncHandler(async (req, res) => {
 // @access private
 
 const setBookAuthors = asyncHandler(async (req, res) => {
-  if (!req.body.author) {
+  if (!req.body.authors) {
     res.status(400);
     throw new Error("Please add an author");
   }
-  const author = mongoose.Types.ObjectId(req.body.author);
+  const authors = req.body.authors;
+  let objectAuthors = [];
+  authors.map((i) => {
+    objectAuthors.push(mongoose.Types.ObjectId(i));
+  });
+
   const addedBookAuthors = await Book.findByIdAndUpdate(req.params.id, {
-    $push: { authors: author },
+    $push: { authors: { $each: objectAuthors } },
   });
 
   res.status(201).json({ message: `Set Book author` });
@@ -117,7 +133,6 @@ const deleteBook = asyncHandler(async (req, res) => {
   }
 
   await book.remove();
-  // const deletedBook = await Book.remove(book); // deleteOne ,  deleteMany insted of remove
 
   res.status(200).json({ message: `Delete Book ${req.params.id}` });
 });
