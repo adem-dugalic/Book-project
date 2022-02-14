@@ -36,5 +36,9 @@ http://localhost:8000/api-docs
 
 ```
 
+For auth on swagger please use the following format for your token:
+
+Bearer: Token (space between Bearer: and token)
+
 ## Made by 
 - Adem Dugalić
