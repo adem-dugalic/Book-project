@@ -29,7 +29,7 @@ JWT_SECRET = your seed
 
 # Routes 
 
-The complete documentation can be foun on swagger:
+The complete documentation can be found on swagger:
 
 ```
 http://localhost:8000/api-docs
