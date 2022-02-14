@@ -1,5 +1,5 @@
 # Book-project
-Simple backend for storing books and witters.
+Simple backend for storing books and witers.
 
 
 # Commands
