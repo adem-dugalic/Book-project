@@ -26,5 +26,15 @@ PORT = 8000
 MONGO_URL = your database link
 JWT_SECRET = your seed
 ```
+
+# Routes 
+
+The complete documentation can be foun on swagger:
+
+```
+http://localhost:8000/api-docs
+
+```
+
 ## Made by 
 - Adem Dugalić
