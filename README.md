@@ -9,7 +9,7 @@ To start first time
 ```
 npm install
 ```
-to install all the packages.
+that will install all the packages.
 
 
 After the installation run 
